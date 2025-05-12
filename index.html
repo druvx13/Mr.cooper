@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mr. Cooper's Strategy Lounge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@300;400;500&display=swap');
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #0a0a0a;
+            color: #e5e5e5;
+            overflow-x: hidden;
+        }
+        
+        .typewriter {
+            border-right: 3px solid #f43f5e;
+            white-space: nowrap;
+            overflow: hidden;
+            animation: blink-caret 0.75s step-end infinite;
+        }
+        
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: #f43f5e; }
+        }
+        
+        .glow-text {
+            text-shadow: 0 0 8px rgba(244, 63, 94, 0.6);
+        }
+        
+        .dossier-card {
+            background: linear-gradient(145deg, #1e1e1e, #141414);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transform: perspective(1000px) rotateX(5deg);
+            transition: all 0.3s ease;
+        }
+        
+        .dossier-card:hover {
+            transform: perspective(1000px) rotateX(0deg) translateY(-5px);
+            box-shadow: 0 15px 35px rgba(244, 63, 94, 0.2);
+        }
+        
+        .red-accent {
+            border-left: 4px solid #f43f5e;
+        }
+        
+        .strategy-item {
+            position: relative;
+            padding-left: 2rem;
+        }
+        
+        .strategy-item:before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0.5rem;
+            width: 1rem;
+            height: 1rem;
+            background-color: #f43f5e;
+            border-radius: 50%;
+        }
+        
+        .terminal {
+            background-color: rgba(20, 20, 20, 0.9);
+            border: 1px solid #333;
+            border-radius: 0.5rem;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .terminal-header {
+            background-color: #1a1a1a;
+            border-bottom: 1px solid #333;
+        }
+        
+        .terminal-body {
+            height: 300px;
+            overflow-y: auto;
+        }
+        
+        .prompt {
+            color: #f43f5e;
+        }
+        
+        .cursor {
+            animation: blink 1s step-end infinite;
+        }
+        
+        @keyframes blink {
+            from, to { opacity: 1 }
+            50% { opacity: 0 }
+        }
+        
+        .rainbow-border {
+            position: relative;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        
+        .rainbow-border:before {
+            content: "";
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #ff0000, #ff7300, #ffbb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+            background-size: 400%;
+            border-radius: 0.6rem;
+            z-index: -1;
+            opacity: 0;
+            transition: 0.5s;
+            animation: rainbow 20s linear infinite;
+        }
+        
+        .rainbow-border:hover:before {
+            opacity: 1;
+        }
+        
+        @keyframes rainbow {
+            0% { background-position: 0 0; }
+            50% { background-position: 400% 0; }
+            100% { background-position: 0 0; }
+        }
+        
+        /* Mobile menu styles */
+        .mobile-menu {
+            display: none;
+            position: absolute;
+            top: 60px;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            padding: 20px;
+            border-bottom: 1px solid #333;
+        }
+        
+        .mobile-menu.active {
+            display: block;
+        }
+        
+        .mobile-menu a {
+            display: block;
+            padding: 10px 0;
+            color: #e5e5e5;
+            border-bottom: 1px solid #333;
+        }
+        
+        .mobile-menu a:hover {
+            color: #f43f5e;
+        }
+        
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background-color: #1a1a1a;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid #f43f5e;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #f43f5e;
+            font-size: 24px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-black bg-opacity-80 backdrop-blur-md fixed w-full z-50 border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <span class="text-2xl font-bold text-red-500 font-serif">Mr. Cooper</span>
+                    </div>
+                    <div class="hidden md:block">
+                        <div class="ml-10 flex items-baseline space-x-4">
+                            <a href="#" class="text-red-400 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Operations</a>
+                            <a href="#" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Dossiers</a>
+                            <a href="#" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Escape Plans</a>
+                            <a href="#" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Black Umbrella Club</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-4 flex items-center md:ml-6">
+                        <button class="bg-gray-800 p-1 rounded-full text-gray-400 hover:text-white focus:outline-none">
+                            <span class="sr-only">View notifications</span>
+                            <i class="fas fa-bell h-6 w-6"></i>
+                        </button>
+                        <div class="ml-3 relative">
+                            <div>
+                                <button class="max-w-xs bg-gray-800 rounded-full flex items-center text-sm focus:outline-none" id="user-menu">
+                                    <span class="sr-only">Open user menu</span>
+                                    <div class="h-8 w-8 rounded-full bg-gradient-to-r from-red-500 to-pink-500 flex items-center justify-center">
+                                        <span class="text-white font-bold">MC</span>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="-mr-2 flex md:hidden">
+                    <button type="button" class="bg-gray-900 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-800 focus:outline-none" aria-controls="mobile-menu" aria-expanded="false" id="mobile-menu-button">
+                        <span class="sr-only">Open main menu</span>
+                        <i class="fas fa-bars h-6 w-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile menu -->
+        <div class="mobile-menu" id="mobile-menu">
+            <a href="#" class="text-red-400">Operations</a>
+            <a href="#">Dossiers</a>
+            <a href="#">Escape Plans</a>
+            <a href="#">Black Umbrella Club</a>
+            <div class="mt-4 pt-4 border-t border-gray-800">
+                <div class="flex items-center">
+                    <div class="h-8 w-8 rounded-full bg-gradient-to-r from-red-500 to-pink-500 flex items-center justify-center mr-3">
+                        <span class="text-white font-bold">MC</span>
+                    </div>
+                    <span class="text-gray-300">Mr. Cooper</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Consultation Modal -->
+    <div class="modal" id="consultation-modal">
+        <div class="modal-content relative">
+            <span class="close-modal" id="close-modal">&times;</span>
+            <h3 class="text-2xl font-bold text-white mb-6 text-center">Request Consultation</h3>
+            <form id="consultation-form">
+                <div class="mb-4">
+                    <label for="name" class="block text-gray-300 mb-2">Your Name</label>
+                    <input type="text" id="name" name="name" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md focus:outline-none focus:border-red-500" required>
+                </div>
+                <div class="mb-4">
+                    <label for="email" class="block text-gray-300 mb-2">Email</label>
+                    <input type="email" id="email" name="email" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md focus:outline-none focus:border-red-500" required>
+                </div>
+                <div class="mb-6">
+                    <label for="request" class="block text-gray-300 mb-2">Your Request</label>
+                    <textarea id="request" name="request" rows="4" class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md focus:outline-none focus:border-red-500" required></textarea>
+                </div>
+                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-md font-medium transition duration-300">
+                    Submit Request
+                </button>
+            </form>
+            <p class="text-xs text-gray-500 mt-4 text-center">
+                All requests are encrypted and handled with utmost discretion.
+            </p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="pt-20 pb-16">
+        <!-- Hero Section -->
+        <section class="relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-24">
+                <div class="md:flex md:items-center md:justify-between">
+                    <div class="md:w-1/2 mb-12 md:mb-0">
+                        <h1 class="text-4xl md:text-6xl font-bold mb-6 font-serif">
+                            <span class="text-white">Problems?</span>
+                            <span class="text-red-500 block md:inline">Solutions.</span>
+                        </h1>
+                        <p class="text-lg md:text-xl text-gray-300 mb-8 max-w-lg">
+                            Every obstacle is an opportunity in disguise. Let's turn your predicament into a masterpiece of strategic elegance.
+                        </p>
+                        <div class="flex space-x-4">
+                            <button id="consultation-btn" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-md font-medium transition duration-300 transform hover:scale-105">
+                                Request Consultation
+                            </button>
+                            <button id="operations-btn" class="border border-gray-600 hover:border-red-500 text-gray-300 hover:text-white px-6 py-3 rounded-md font-medium transition duration-300">
+                                View Past Operations
+                            </button>
+                        </div>
+                    </div>
+                    <div class="md:w-1/2 relative">
+                        <div class="rainbow-border">
+                            <div class="bg-gray-900 p-1 rounded-lg">
+                                <img src="https://images.unsplash.com/photo-1560253023-3ec5d502959f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Mr. Cooper" class="rounded-lg w-full h-auto opacity-90">
+                            </div>
+                        </div>
+                        <div class="absolute -bottom-6 -left-6 bg-gray-900 p-4 rounded-lg shadow-xl border border-gray-800">
+                            <div class="flex items-center">
+                                <div class="h-3 w-3 rounded-full bg-red-500 mr-2"></div>
+                                <p class="text-sm text-gray-300">Active Operation</p>
+                            </div>
+                            <p class="text-white font-medium mt-1">Project: Red Queen</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Strategy Terminal -->
+        <section class="bg-black py-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold text-center mb-12">
+                    <span class="text-white">Strategic</span>
+                    <span class="text-red-500">Terminal</span>
+                </h2>
+                <div class="terminal max-w-4xl mx-auto">
+                    <div class="terminal-header p-3 flex items-center">
+                        <div class="flex space-x-2 mr-4">
+                            <div class="h-3 w-3 rounded-full bg-red-500"></div>
+                            <div class="h-3 w-3 rounded-full bg-yellow-500"></div>
+                            <div class="h-3 w-3 rounded-full bg-green-500"></div>
+                        </div>
+                        <p class="text-gray-400 text-sm">mr_cooper@black_umbrella: ~/current_operations</p>
+                    </div>
+                    <div class="terminal-body p-4" id="terminal-output">
+                        <div class="mb-2">
+                            <span class="prompt">></span> <span class="text-white">Initializing strategic interface...</span>
+                        </div>
+                        <div class="mb-2">
+                            <span class="prompt">></span> <span class="text-white">Connection established with Black Umbrella Club</span>
+                        </div>
+                        <div class="mb-2">
+                            <span class="prompt">></span> <span class="text-white">Access level: Omega Clearance</span>
+                        </div>
+                        <div class="mb-2">
+                            <span class="prompt">></span> <span class="text-white">Last login: Prague, Czech Republic</span>
+                        </div>
+                        <div class="mb-2">
+                            <span class="prompt">></span> <span class="text-white">Current operation: Red Queen [Phase 3]</span>
+                        </div>
+                        <div class="mb-2">
+                            <span class="prompt">></span> <span class="text-white">Escape risk assessment: <span class="text-green-400">Low</span></span>
+                        </div>
+                        <div class="mb-2">
+                            <span class="prompt">></span> <span class="text-white">Plan confidence level: <span class="text-green-400">97%</span></span>
+                        </div>
+                        <div class="mb-2">
+                            <span class="prompt">></span> <span class="text-white typewriter" id="typewriter">Awaiting your query...</span><span class="cursor">|</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Strategy Showcase -->
+        <section class="py-16 bg-gradient-to-b from-black to-gray-900">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold text-center mb-12">
+                    <span class="text-white">Signature</span>
+                    <span class="text-red-500">Strategies</span>
+                </h2>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <!-- Strategy 1 -->
+                    <div class="dossier-card p-6 rounded-lg">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-red-500 bg-opacity-20 p-2 rounded-full mr-4">
+                                <i class="fas fa-chess-queen text-red-500 text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white">Red Queen Gambit</h3>
+                        </div>
+                        <p class="text-gray-400 mb-4">A multi-layered deception that forces opponents to chase shadows while the real operation unfolds elsewhere.</p>
+                        <div class="mb-4">
+                            <div class="flex justify-between text-sm text-gray-500 mb-1">
+                                <span>Success Rate</span>
+                                <span>96%</span>
+                            </div>
+                            <div class="w-full bg-gray-800 rounded-full h-2">
+                                <div class="bg-red-500 h-2 rounded-full" style="width: 96%"></div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-400">Last used: Prague</span>
+                            <span class="text-red-400">Active</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Strategy 2 -->
+                    <div class="dossier-card p-6 rounded-lg">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-red-500 bg-opacity-20 p-2 rounded-full mr-4">
+                                <i class="fas fa-umbrella text-red-500 text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white">Black Umbrella</h3>
+                        </div>
+                        <p class="text-gray-400 mb-4">Creating plausible deniability through a network of cutouts and intermediaries, leaving no direct trail.</p>
+                        <div class="mb-4">
+                            <div class="flex justify-between text-sm text-gray-500 mb-1">
+                                <span>Success Rate</span>
+                                <span>89%</span>
+                            </div>
+                            <div class="w-full bg-gray-800 rounded-full h-2">
+                                <div class="bg-red-500 h-2 rounded-full" style="width: 89%"></div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-400">Last used: London</span>
+                            <span class="text-yellow-400">Standby</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Strategy 3 -->
+                    <div class="dossier-card p-6 rounded-lg">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-red-500 bg-opacity-20 p-2 rounded-full mr-4">
+                                <i class="fas fa-ghost text-red-500 text-xl"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white">Phantom Protocol</h3>
+                        </div>
+                        <p class="text-gray-400 mb-4">Complete disappearance with planted evidence suggesting your demise, allowing for quiet repositioning.</p>
+                        <div class="mb-4">
+                            <div class="flex justify-between text-sm text-gray-500 mb-1">
+                                <span>Success Rate</span>
+                                <span>91%</span>
+                            </div>
+                            <div class="w-full bg-gray-800 rounded-full h-2">
+                                <div class="bg-red-500 h-2 rounded-full" style="width: 91%"></div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between text-sm">
+                            <span class="text-gray-400">Last used: Tokyo</span>
+                            <span class="text-green-400">Available</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Operation Steps -->
+        <section class="py-16 bg-black">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold text-center mb-12">
+                    <span class="text-white">Standard</span>
+                    <span class="text-red-500">Procedure</span>
+                </h2>
+                <div class="bg-gray-900 bg-opacity-50 p-8 rounded-lg border border-gray-800">
+                    <div class="space-y-8">
+                        <div class="strategy-item">
+                            <h3 class="text-xl font-bold text-white mb-2">1. Identify the Pawns</h3>
+                            <p class="text-gray-400">Every player has a role, whether they know it or not. We'll assign them parts in our little play.</p>
+                        </div>
+                        <div class="strategy-item">
+                            <h3 class="text-xl font-bold text-white mb-2">2. Craft the Narrative</h3>
+                            <p class="text-gray-400">Control the story and you control the truth. We'll plant just enough evidence to make our version irresistible.</p>
+                        </div>
+                        <div class="strategy-item">
+                            <h3 class="text-xl font-bold text-white mb-2">3. Orchestrate the Diversion</h3>
+                            <p class="text-gray-400">While they're chasing the red herring, the real operation proceeds undisturbed.</p>
+                        </div>
+                        <div class="strategy-item">
+                            <h3 class="text-xl font-bold text-white mb-2">4. Execute with Precision</h3>
+                            <p class="text-gray-400">Timing is everything. We'll move when they're looking the other way.</p>
+                        </div>
+                        <div class="strategy-item">
+                            <h3 class="text-xl font-bold text-white mb-2">5. Disappear Gracefully</h3>
+                            <p class="text-gray-400">Leave no trace except what we want them to find. The perfect crime is one where they're not even sure a crime occurred.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials -->
+        <section class="py-16 bg-gradient-to-b from-gray-900 to-black" id="testimonials">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold text-center mb-12">
+                    <span class="text-white">From the</span>
+                    <span class="text-red-500">Shadows</span>
+                </h2>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-gray-900 p-6 rounded-lg border border-gray-800">
+                        <div class="flex items-center mb-4">
+                            <div class="h-10 w-10 rounded-full bg-red-900 flex items-center justify-center mr-4">
+                                <i class="fas fa-user-secret text-red-400"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-white">Former MI6 Operative</h4>
+                                <p class="text-sm text-gray-400">London, UK</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-300 italic">"We had him surrounded in Prague. CCTV on every corner, every exit covered. And yet... the next morning we found all our surveillance footage replaced with footage of us playing chess against ourselves. He left a note: 'Checkmate is a state of mind.'"</p>
+                    </div>
+                    <div class="bg-gray-900 p-6 rounded-lg border border-gray-800">
+                        <div class="flex items-center mb-4">
+                            <div class="h-10 w-10 rounded-full bg-red-900 flex items-center justify-center mr-4">
+                                <i class="fas fa-briefcase text-red-400"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-white">Corporate Security Director</h4>
+                                <p class="text-sm text-gray-400">Zurich, Switzerland</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-300 italic">"Our vault had biometric locks, pressure sensors, and a 12-hour time delay. Mr. Cooper didn't break in. He had our CEO personally open it for him at 3am, convinced it was part of a fire drill. The security logs show nothing unusual."</p>
+                    </div>
+                    <div class="bg-gray-900 p-6 rounded-lg border border-gray-800">
+                        <div class="flex items-center mb-4">
+                            <div class="h-10 w-10 rounded-full bg-red-900 flex items-center justify-center mr-4">
+                                <i class="fas fa-globe-europe text-red-400"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-white">Interpol Investigator</h4>
+                                <p class="text-sm text-gray-400">Lyon, France</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-300 italic">"We intercepted what we thought was his communications network. Turns out he had created an entire fake organization with 200+ members, all believing they were part of some secret society. The sheer scale of the deception was... impressive."</p>
+                    </div>
+                    <div class="bg-gray-900 p-6 rounded-lg border border-gray-800">
+                        <div class="flex items-center mb-4">
+                            <div class="h-10 w-10 rounded-full bg-red-900 flex items-center justify-center mr-4">
+                                <i class="fas fa-university text-red-400"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-white">Bank Executive</h4>
+                                <p class="text-sm text-gray-400">New York, USA</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-300 italic">"He didn't steal money from our bank. He had us transfer it to what we believed was our own internal account. The auditors didn't notice for 6 months because all the paperwork was perfect. We only realized when we tried to access those funds."</p>
+                    </div>
+                    <div class="bg-gray-900 p-6 rounded-lg border border-gray-800">
+                        <div class="flex items-center mb-4">
+                            <div class="h-10 w-10 rounded-full bg-red-900 flex items-center justify-center mr-4">
+                                <i class="fas fa-lock text-red-400"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-white">Security Consultant</h4>
+                                <p class="text-sm text-gray-400">Singapore</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-300 italic">"I was hired to track him down. Three months later, I received a package containing all my personal documents, a bottle of excellent scotch, and a note: 'Better luck next time.' I still don't know how he got those documents."</p>
+                    </div>
+                    <div class="bg-gray-900 p-6 rounded-lg border border-gray-800">
+                        <div class="flex items-center mb-4">
+                            <div class="h-10 w-10 rounded-full bg-red-900 flex items-center justify-center mr-4">
+                                <i class="fas fa-mask text-red-400"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-white">Underworld Figure</h4>
+                                <p class="text-sm text-gray-400">Marseille, France</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-300 italic">"We had a deal. I thought I was double-crossing him. Turns out he knew and had arranged for my own people to think I was working against them. By the time I realized, I had no choice but to honor our original agreement. Brilliant play."</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-black py-8 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="md:flex md:items-center md:justify-between">
+                <div class="flex justify-center md:order-2 space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-red-500">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-red-500">
+                        <i class="fab fa-github"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-red-500">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                </div>
+                <div class="mt-8 md:mt-0 md:order-1">
+                    <p class="text-center text-sm text-gray-400">
+                        &copy; 2023 Black Umbrella Club. All rights reserved.
+                        <span class="block md:inline">Or do we?</span>
+                    </p>
+                </div>
+            </div>
+            <div class="mt-8 text-center">
+                <p class="text-xs text-gray-600">
+                    Disclaimer: All operations are purely fictional. Any resemblance to actual events is either coincidental or part of an elaborate ruse.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Typewriter effect
+        const phrases = [
+            "Awaiting your query...",
+            "Preparing strategic analysis...",
+            "Accessing Black Umbrella database...",
+            "Calculating optimal deception vectors...",
+            "Remember: Control the narrative, and the truth becomes irrelevant."
+        ];
+        
+        let phraseIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        let typingSpeed = 100;
+        
+        function typeWriter() {
+            const element = document.getElementById("typewriter");
+            
+            if (phraseIndex >= phrases.length) {
+                phraseIndex = 0;
+            }
+            
+            const currentPhrase = phrases[phraseIndex];
+            
+            if (isDeleting) {
+                element.textContent = currentPhrase.substring(0, charIndex - 1);
+                charIndex--;
+                typingSpeed = 50;
+            } else {
+                element.textContent = currentPhrase.substring(0, charIndex + 1);
+                charIndex++;
+                typingSpeed = 100;
+            }
+            
+            if (!isDeleting && charIndex === currentPhrase.length) {
+                isDeleting = true;
+                typingSpeed = 1500; // Pause at end of phrase
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                phraseIndex++;
+                typingSpeed = 500; // Pause between phrases
+            }
+            
+            setTimeout(typeWriter, typingSpeed);
+        }
+        
+        // Mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileMenuButton.addEventListener('click', function() {
+            mobileMenu.classList.toggle('active');
+        });
+        
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!mobileMenu.contains(event.target) && event.target !== mobileMenuButton) {
+                mobileMenu.classList.remove('active');
+            }
+        });
+        
+        // Modal functionality
+        const consultationBtn = document.getElementById('consultation-btn');
+        const operationsBtn = document.getElementById('operations-btn');
+        const modal = document.getElementById('consultation-modal');
+        const closeModal = document.getElementById('close-modal');
+        const consultationForm = document.getElementById('consultation-form');
+        
+        consultationBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            modal.classList.add('active');
+        });
+        
+        operationsBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('testimonials').scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+        
+        closeModal.addEventListener('click', function() {
+            modal.classList.remove('active');
+        });
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+        
+        // Form submission
+        consultationForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const request = document.getElementById('request').value;
+            
+            // Here you would normally send the data to a server
+            // For this demo, we'll just show an alert and reset the form
+            alert(`Request submitted successfully!\n\nName: ${name}\nEmail: ${email}\nRequest: ${request}`);
+            
+            // Reset form
+            consultationForm.reset();
+            
+            // Close modal
+            modal.classList.remove('active');
+        });
+        
+        // Start the typewriter effect
+        window.onload = function() {
+            setTimeout(typeWriter, 1000);
+            
+            // Terminal scroll effect
+            const terminal = document.getElementById("terminal-output");
+            terminal.scrollTop = terminal.scrollHeight;
+            
+            // Add more terminal lines dynamically
+            const terminalLines = [
+                "> Analyzing threat vectors...",
+                "> Identifying potential assets...",
+                "> Calculating escape routes...",
+                "> Remember: The best hiding spot is in plain sight.",
+                "> Operation status: Ready for your command"
+            ];
+            
+            let lineIndex = 0;
+            const terminalInterval = setInterval(() => {
+                if (lineIndex < terminalLines.length) {
+                    const newLine = document.createElement("div");
+                    newLine.className = "mb-2";
+                    newLine.innerHTML = `<span class="prompt">></span> <span class="text-white">${terminalLines[lineIndex]}</span>`;
+                    terminal.appendChild(newLine);
+                    terminal.scrollTop = terminal.scrollHeight;
+                    lineIndex++;
+                } else {
+                    clearInterval(terminalInterval);
+                }
+            }, 2000);
+        };
+    </script>
+</body>
+</html>
